@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>বই অর্ডার ফর্ম</title>
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Hind Siliguri', sans-serif; background-color: #f0f2f5; display: flex; justify-content: center; padding: 20px; direction: ltr; }
+        .order-container { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 15px 35px rgba(0,0,0,0.1); max-width: 450px; width: 100%; }
+        h2 { color: #1a73e8; text-align: center; margin-bottom: 10px; }
+        .payment-box { background: #fff9c4; padding: 15px; border-radius: 10px; font-size: 15px; margin-bottom: 20px; border-left: 6px solid #fbc02d; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; color: #333; }
+        input, select { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; font-size: 14px; }
+        button { width: 100%; padding: 15px; background-color: #1a73e8; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold; transition: 0.3s; }
+        button:hover { background-color: #1557b0; }
+        #msg { text-align: center; padding: 10px; margin-top: 10px; border-radius: 5px; display: none; }
+        .success { background-color: #d4edda; color: #155724; }
+    </style>
+</head>
+<body>
+
+<div class="order-container">
+    <h2>বইটি সংগ্রহ করুন</h2>
+    
+    <div class="payment-box">
+        <strong>পেমেন্ট পদ্ধতি:</strong><br>
+        বিকাশ/নগদ (পার্সোনাল): <b>আপনার_নম্বর_এখানে</b><br>
+        টাকা পাঠানোর পর নিচের তথ্যগুলো দিন।
+    </div>
+
+    <form id="submit-to-google-sheet">
+        <label>আপনার নাম</label>
+        <input type="text" name="name" placeholder="পুরো নাম লিখুন" required>
+
+        <label>আপনার ইমেইল (বইটি এখানে যাবে)</label>
+        <input type="email" name="email" placeholder="example@gmail.com" required>
+
+        <label>পেমেন্ট মাধ্যম</label>
+        <select name="method">
+            <option value="Bkash">বিকাশ (Bkash)</option>
+            <option value="Nagad">নগদ (Nagad)</option>
+        </select>
+
+        <label>প্রেরক নম্বর (শেষ ৪ ডিজিট)</label>
+        <input type="text" name="last4" placeholder="যেমন: ৪৩২১" required>
+
+        <label>ট্রানজেকশন আইডি (TrxID)</label>
+        <input type="text" name="trxid" placeholder="TrxID দিন" required>
+
+        <button type="submit" id="submitBtn">অর্ডার কনফার্ম করুন</button>
+    </form>
+    
+    <div id="msg"></div>
+</div>
+
+<script>
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbzwzoVZ-bIhWnEIF9lGFSEETR67wvWsSNr6QGxkdJJ24X8joTXHyxV5z77K2jKg7aOA/exec';
+    const form = document.getElementById('submit-to-google-sheet');
+    const msg = document.getElementById('msg');
+    const btn = document.getElementById('submitBtn');
+
+    form.addEventListener('submit', e => {
+      e.preventDefault();
+      btn.disabled = true;
+      btn.innerText = "অপেক্ষা করুন...";
+      
+      fetch(scriptURL, { method: 'POST', body: new FormData(form)})
+        .then(response => {
+            msg.style.display = "block";
+            msg.classList.add("success");
+            msg.innerHTML = "ধন্যবাদ! আপনার তথ্য জমা হয়েছে। দ্রুতই ইমেইল পাবেন।";
+            btn.disabled = false;
+            btn.innerText = "অর্ডার কনফার্ম করুন";
+            form.reset();
+        })
+        .catch(error => {
+            console.error('Error!', error.message);
+            btn.disabled = false;
+            btn.innerText = "অর্ডার কনফার্ম করুন";
+        });
+    });
+</script>
+
+</body>
+</html>
